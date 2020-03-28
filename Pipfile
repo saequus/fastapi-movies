@@ -12,4 +12,4 @@ python-multipart = "*"
 databases = {extras = ["postgresql"],version = "*"}
 
 [requires]
-python_version = "3.7"
+python_version = "3.8"

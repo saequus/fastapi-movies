@@ -33,7 +33,7 @@ movies = Table(
     Column('name', String(128)),
     Column('description', String(256)),
     Column('year', String(8)),
-    Column('casts', ARRAY(String))
+    Column('casts_id', ARRAY(Integer))
 )
 
 database = Database(DATABASE_URL)
