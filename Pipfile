@@ -9,6 +9,7 @@ verify_ssl = true
 fastapi = "*"
 uvicorn = "*"
 python-multipart = "*"
+databases = {extras = ["postgresql"],version = "*"}
 
 [requires]
 python_version = "3.7"

@@ -1,33 +1,35 @@
 from fastapi.exceptions import HTTPException
 from typing import List
 
-from api.models import Movieзш
+from api.models import MovieIn, MovieOut
 from fastapi import APIRouter
+from api.db import get_all_movies, add_movie
 
 movies_router = APIRouter()
 
 
 fake_result = [
     {
-        'film': 'Star Wars',
+        'name': 'Star Wars',
         'description': 'SW description',
         'casts': ['MWM', 'EOG'],
         'year': '2019'
     },
     {
-        'film': 'Tower',
+        'name': 'Tower',
         'description': 'Tower description',
         'casts': ['MWM', 'EOG'],
         'year': '2013'
     },
     {
-        'film': 'New Age',
+        'name': 'New Age',
         'description': 'NA description',
         'casts': ['MWM', 'EOG'],
         'year': '2011'
     },
     {
-        'film': 'Home',
+        
+        'name': 'Home',
         'description': 'Home description',
         'casts': ['MWM', 'EOG'],
         'year': '2011'
@@ -35,21 +37,23 @@ fake_result = [
 ]
 
 
-@movies_router.get('/movies', response_model=List[Movie])
-async def movies():
-    return fake_result
+@movies_router.get('/movies', response_model=List[MovieOut])
+async def index():
+    return await get_all_movies()
 
 
-@movies_router.post('/movies/', response_model=Movie, status_code=201)
-async def add_movie(payload: Movie):
-    movie = payload.dict()
-    fake_result.append(movie)
-    movie['id'] = len(fake_result) - 1
-    return movie
+@movies_router.post('/movies', response_model=MovieIn, status_code=201)
+async def api_add_movie(payload: MovieIn):
+    movie_id = await add_movie(payload)
+    response = {
+        'id': movie_id,
+        **payload.dict()
+    }
+    return response
 
 
-@movies_router.put('/movies/{movie_id}', response_model=Movie)
-async def update_movie(movie_id: int, payload: Movie):
+@movies_router.put('/movies/{movie_id}', response_model=MovieIn)
+async def update_movie(movie_id: int, payload: MovieIn):
     movie = payload.dict()
     movies_length = len(fake_result)
     if not (0 <= movie_id <= movies_length - 1):
