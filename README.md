@@ -8,20 +8,19 @@ Prepare
 
     pipenv install
     
-Database
+Database. In order to create movies TABLE run SQL command below
 
     CREATE TABLE movies (
-	id serial PRIMARY KEY,
-	name varchar(128),
-	description varchar(256),
-	year varchar(8),
-	casts text [],
-		UNIQUE(name)
+        id serial PRIMARY KEY,
+        name varchar(128),
+        description varchar(256),
+        year varchar(8),
+        casts text [],
+		    UNIQUE(name)
     );
 
-Run
+Run server
     
     . ./variables.sh
     
     uvicorn main:app --reload --port 8000
-    

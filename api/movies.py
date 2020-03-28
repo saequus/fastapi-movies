@@ -3,42 +3,13 @@ from typing import List
 
 from api.models import MovieIn, MovieOut
 from fastapi import APIRouter
-from api.db import get_all_movies, add_movie
+from api.db import get_all_movies, get_movie, add_movie, update_movie, delete_movie
 
 movies_router = APIRouter()
 
 
-fake_result = [
-    {
-        'name': 'Star Wars',
-        'description': 'SW description',
-        'casts': ['MWM', 'EOG'],
-        'year': '2019'
-    },
-    {
-        'name': 'Tower',
-        'description': 'Tower description',
-        'casts': ['MWM', 'EOG'],
-        'year': '2013'
-    },
-    {
-        'name': 'New Age',
-        'description': 'NA description',
-        'casts': ['MWM', 'EOG'],
-        'year': '2011'
-    },
-    {
-        
-        'name': 'Home',
-        'description': 'Home description',
-        'casts': ['MWM', 'EOG'],
-        'year': '2011'
-    },
-]
-
-
 @movies_router.get('/movies', response_model=List[MovieOut])
-async def index():
+async def api_get_movie():
     return await get_all_movies()
 
 
@@ -53,22 +24,21 @@ async def api_add_movie(payload: MovieIn):
 
 
 @movies_router.put('/movies/{movie_id}', response_model=MovieIn)
-async def update_movie(movie_id: int, payload: MovieIn):
-    movie = payload.dict()
-    movies_length = len(fake_result)
-    if not (0 <= movie_id <= movies_length - 1):
-        raise HTTPException(
-            status_code=404,
-            detail='Movie with given id not found'
-        )
-    fake_result[movie_id] = movie
-    return movie
+async def api_update_movie(movie_id: int, payload: MovieIn):
+    movie = await get_movie(movie_id)
+    if not movie:
+        raise HTTPException(status_code=404, detail='Movie not found')
+    
+    update_data = payload.dict(exclude_unset=True)
+    movie_in_db = MovieIn(**movie)
+
+    updated_movie = movie_in_db.copy(update=update_data)
+    return await update_movie(movie_id, updated_movie)
 
 
 @movies_router.delete('/movies/{movie_id}')
-async def delete_movie(movie_id: int):
-    movies_length = len(fake_result)
-    if not (0 <= movie_id <= movies_length):
-        raise HTTPException(status_code=404, detail='Movie with given id not found')
-    del fake_result[movie_id]
-    return None
+async def api_delete_movie(movie_id: int):
+    movie = await get_movie(movie_id)
+    if not movie:
+        return HTTPException(status_code=404, detail='Movie not found')
+    return await delete_movie(movie_id)
