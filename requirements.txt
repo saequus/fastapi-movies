@@ -1,4 +1,4 @@
-asyncpg==0.20.1
+asyncpg==0.21.0
 click==7.1.1
 databases==0.2.6
 fastapi==0.53.0
